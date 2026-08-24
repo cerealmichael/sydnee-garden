@@ -1,0 +1,28 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px 8px;
+  flex: none;
+}
+
+.back {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: transform 120ms ease;
+}
+
+.back:active {
+  transform: scale(0.92);
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}

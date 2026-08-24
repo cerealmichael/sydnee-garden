@@ -1,0 +1,25 @@
+.notice {
+  display: none;
+}
+
+/* tylko na telefonie w poziomie - tablety/desktop zostawiamy w spokoju */
+@media (orientation: landscape) and (max-height: 500px) {
+  .notice {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 12px;
+    background: var(--bg);
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .cat {
+    width: 160px;
+    height: auto;
+    transform: rotate(-90deg);
+  }
+}

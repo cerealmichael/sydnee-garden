@@ -1,0 +1,15 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding: var(--sat) var(--sar) var(--sab) var(--sal);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 4px 20px calc(20px + var(--sab));
+}

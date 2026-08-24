@@ -1,0 +1,86 @@
+:root {
+  /* pastele */
+  --bg: #fff6fa;
+  --bg-2: #f3edff;
+  --surface: #ffffff;
+  --ink: #4a4258;
+  --ink-soft: #9a92ad;
+  --pink: #ffc2d6;
+  --lilac: #dcd1ff;
+  --mint: #c6ecd9;
+  --butter: #ffe6ac;
+  --peach: #ffd3b6;
+  --sky: #c7e4ff;
+
+  /* zaokraglenia */
+  --r-sm: 20px;
+  --r-md: 28px;
+  --r-lg: 36px;
+
+  --shadow: 0 10px 24px rgba(122, 96, 140, 0.14);
+  --shadow-press: 0 4px 12px rgba(122, 96, 140, 0.16);
+
+  /* safe area (iPhone notch / home indicator) */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100dvh;
+}
+
+body {
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: 'Baloo 2', ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  font-weight: 600;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+  overflow: hidden;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#root {
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* jedziemy touch-first: zero :hover, tylko :active */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

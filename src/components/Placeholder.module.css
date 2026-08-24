@@ -1,0 +1,15 @@
+.wrap {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 18px;
+  min-height: 70%;
+  text-align: center;
+}
+
+.text {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  max-width: 22ch;
+}

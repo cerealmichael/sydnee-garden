@@ -1,0 +1,13 @@
+.badge {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: none;
+}
+
+.cat {
+  width: 78%;
+  height: auto;
+  transform: translateY(6%);
+}

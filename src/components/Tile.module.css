@@ -1,0 +1,35 @@
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  border: 3px solid var(--accent);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.tile:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-press);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
