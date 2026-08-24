@@ -1,19 +1,19 @@
-import PusheenCat from './PusheenCat'
+import Cat from './Cat'
+import type { CatName } from '../lib/cats'
 import s from './CatBadge.module.css'
 
 type Props = {
-  item?: 'sprout' | 'fruit' | 'letter'
+  cat?: CatName
   /** kolor kola - dowolny token z palety */
   color?: string
   size?: number
-  title?: string
 }
 
 /** Kotek w pastelowym kole. */
-export default function CatBadge({ item, color = 'var(--pink)', size = 96, title }: Props) {
+export default function CatBadge({ cat = 'classic', color = 'var(--pink)', size = 96 }: Props) {
   return (
     <div className={s.badge} style={{ background: color, width: size, height: size }}>
-      <PusheenCat item={item} title={title} className={s.cat} />
+      <Cat name={cat} className={s.cat} />
     </div>
   )
 }

@@ -7,7 +7,7 @@ export default function Hub() {
   return (
     <Screen>
       <div className={s.hero}>
-        <CatBadge color="var(--lilac)" size={132} title="Kotek" />
+        <CatBadge cat="unicorn" color="var(--lilac)" size={132} />
         <h1 className={s.hello}>Cześć 🌸</h1>
       </div>
 
@@ -17,16 +17,16 @@ export default function Hub() {
           title="Ogródek"
           subtitle="Nasze rosnące coś"
           color="var(--mint)"
-          item="sprout"
+          cat="classic"
         />
         <Tile
           to="/merge"
           title="Pusheen Merge"
           subtitle="Łącz kotki"
           color="var(--peach)"
-          item="fruit"
+          cat="donut"
         />
-        <Tile to="/list" title="List" subtitle="Do przeczytania" color="var(--pink)" item="letter" />
+        <Tile to="/list" title="List" subtitle="Do przeczytania" color="var(--pink)" cat="gift" />
       </nav>
     </Screen>
   )

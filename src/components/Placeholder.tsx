@@ -1,17 +1,18 @@
 import CatBadge from './CatBadge'
+import type { CatName } from '../lib/cats'
 import s from './Placeholder.module.css'
 
 type Props = {
   text: string
   color: string
-  item?: 'sprout' | 'fruit' | 'letter'
+  cat: CatName
 }
 
 /** Tymczasowa zawartosc pustych ekranow. */
-export default function Placeholder({ text, color, item }: Props) {
+export default function Placeholder({ text, color, cat }: Props) {
   return (
     <div className={s.wrap}>
-      <CatBadge color={color} size={140} item={item} />
+      <CatBadge cat={cat} color={color} size={140} />
       <p className={s.text}>{text}</p>
     </div>
   )

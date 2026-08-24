@@ -7,7 +7,8 @@
 }
 
 .cat {
-  width: 78%;
-  height: auto;
-  transform: translateY(6%);
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  transform: translateY(4%);
 }
