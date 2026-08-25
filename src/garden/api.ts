@@ -19,6 +19,7 @@ export type NewFlower = Omit<Flower, 'id' | 'created_at'>
 export type GardenApi = {
   list: () => Promise<Flower[]>
   plant: (flower: NewFlower) => Promise<void>
+  remove: (id: string) => Promise<void>
   /** wola cb, gdy druga osoba cos zasadzi - zwraca funkcje odpinajaca */
   subscribe: (cb: () => void) => () => void
 }
@@ -46,6 +47,14 @@ function localGarden(): GardenApi {
         /* trudno */
       }
     },
+    remove: async (id) => {
+      const all = read().filter((f) => f.id !== id)
+      try {
+        localStorage.setItem(LOCAL_KEY, JSON.stringify(all))
+      } catch {
+        /* trudno */
+      }
+    },
     subscribe: () => () => {},
   }
 }
@@ -66,14 +75,16 @@ function supabaseGarden(client: NonNullable<typeof supabase>): GardenApi {
       if (error) throw error
     },
 
+    remove: async (id) => {
+      const { error } = await client.from('flowers').delete().eq('id', id)
+      if (error) throw error
+    },
+
     subscribe: (cb) => {
+      // '*' zamiast INSERT, zeby usuniecie u drugiej osoby tez bylo widac
       const channel = client
         .channel('flowers')
-        .on(
-          'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'flowers' },
-          () => cb(),
-        )
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'flowers' }, () => cb())
         .subscribe()
       return () => {
         client.removeChannel(channel)

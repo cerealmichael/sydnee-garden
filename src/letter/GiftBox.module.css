@@ -1,0 +1,130 @@
+.gift {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 0 4px;
+}
+
+.art {
+  width: min(58%, 190px);
+  height: auto;
+}
+
+.closed .art {
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+.closed:active .art {
+  transform: scale(0.94);
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(1deg);
+  }
+}
+
+.hint {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+/* --- otwieranie: pudełko drga, wieczko odlatuje, sypią się iskry --- */
+
+.opening .art,
+.open .art {
+  animation: none;
+}
+
+.opening .base {
+  animation: wobble 620ms ease;
+  transform-origin: 60px 108px;
+}
+
+.opening .lid {
+  animation: liftoff 620ms cubic-bezier(0.3, -0.4, 0.5, 1) forwards;
+}
+
+.open {
+  display: none;
+}
+
+@keyframes wobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-7deg);
+  }
+  45% {
+    transform: rotate(6deg);
+  }
+  70% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes liftoff {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  35% {
+    transform: translateY(-6px) rotate(-4deg);
+  }
+  100% {
+    transform: translateY(-90px) rotate(16deg);
+    opacity: 0;
+  }
+}
+
+.sparks {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.sparks span {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--butter);
+  opacity: 0;
+}
+
+.sparks span:nth-child(even) {
+  background: var(--pink);
+}
+
+.sparks span:nth-child(3n) {
+  background: var(--lilac);
+}
+
+.opening .sparks span {
+  animation: burst 700ms ease-out forwards;
+  animation-delay: 120ms;
+}
+
+@keyframes burst {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--deg)) translateY(0) scale(0.4);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--deg)) translateY(-120px) scale(1.1);
+  }
+}

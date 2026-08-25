@@ -68,6 +68,9 @@ o powierzchnię), więc gęstość zostaje ta sama. Jeden palec przesuwa, dwa sk
 (`usePanZoom.ts`), przycisk ⤢ wraca do widoku całości. Transform idzie prosto do stylu,
 z pominięciem Reacta, żeby gest był płynny.
 
+Kwiatka można wyrwać: tapnięcie zaznacza, kosz w pasku pyta o potwierdzenie.
+Usunięcie widać u drugiej osoby od razu (kanał realtime słucha `*`, nie samych INSERT-ów).
+
 Miejsce na łące wybiera `spot.ts`: losuje kilkudziesięciu kandydatów wewnątrz elipsy trawy
 i bierze tego najdalszego od już zasadzonych. Pozycja zapisuje się razem z kwiatkiem,
 więc potem już się nie rusza.
@@ -87,6 +90,11 @@ Kto jest kim siedzi w `PEOPLE` w `src/lib/person.ts`. Wybór osoby zapisuje się
 w localStorage, więc pytanie pada raz na telefon.
 
 ## List
+
+Najpierw czyta się treść, a zdjęcie siedzi w prezencie pod spodem — tapnięcie odpala
+animację (pudełko drga, wieczko odlatuje, sypią się iskierki) i zdjęcie wskakuje
+z rozmycia. Prezent zamyka się z powrotem po podmianie zdjęcia i przy każdym wejściu
+na ekran, żeby ten moment dało się przeżyć więcej niż raz.
 
 Treść i zdjęcie wpisujesz z poziomu apki — jeden wiersz w tabeli `letter` (id = 1),
 edytowany przez oboje. Zdjęcie przed wysłaniem jest zmniejszane w canvasie do 1600 px

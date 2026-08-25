@@ -45,8 +45,22 @@ export function useGarden() {
     [busy, flowers, refresh],
   )
 
+  const remove = useCallback(
+    async (id: string) => {
+      // optymistycznie - kwiatek znika od razu spod palca
+      setFlowers((all) => all.filter((f) => f.id !== id))
+      try {
+        await garden.remove(id)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Nie udało się usunąć')
+      }
+      await refresh()
+    },
+    [refresh],
+  )
+
   const mine = (person: Person | null) =>
     person ? flowers.filter((f) => f.author === person).length : 0
 
-  return { flowers, loading, error, busy, plant, mine }
+  return { flowers, loading, error, busy, plant, remove, mine }
 }

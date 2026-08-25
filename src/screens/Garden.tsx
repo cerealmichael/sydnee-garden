@@ -13,6 +13,7 @@ export default function Garden() {
   const [person, setPerson] = useState<Person | null>(readPerson)
   const [drawing, setDrawing] = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
+  const [confirming, setConfirming] = useState(false)
   const g = useGarden()
 
   const pick = (p: Person) => {
@@ -27,27 +28,58 @@ export default function Garden() {
     if (ok) setDrawing(false)
   }
 
+  const select = (id: string | null) => {
+    setSelected(id)
+    setConfirming(false)
+  }
+
+  const remove = async () => {
+    if (!selected) return
+    const id = selected
+    select(null)
+    await g.remove(id)
+  }
+
   const picked = g.flowers.find((f) => f.id === selected)
 
   return (
     <Screen title="Ogródek" back fill>
-      <Meadow flowers={g.flowers} selected={selected} onSelect={setSelected} />
+      <Meadow flowers={g.flowers} selected={selected} onSelect={select} />
 
       <div className={s.bar}>
         {picked ? (
-          <span className={s.info}>
-            <Cat name={PEOPLE[picked.author].cat} className={s.infoCat} />
-            <span className={s.infoText}>
-              <span className={s.infoWho}>
-                {PEOPLE[picked.author].name} ·{' '}
-                {new Date(picked.created_at).toLocaleDateString('pl-PL', {
-                  day: 'numeric',
-                  month: 'long',
-                })}
-              </span>
-              {picked.note && <span className={s.infoNote}>{picked.note}</span>}
+          confirming ? (
+            <span className={s.info}>
+              <span className={s.infoWho}>Wyrwać kwiatka?</span>
+              <button className={s.yes} onClick={remove}>
+                Tak
+              </button>
+              <button className={s.no} onClick={() => setConfirming(false)}>
+                Nie
+              </button>
             </span>
-          </span>
+          ) : (
+            <span className={s.info}>
+              <Cat name={PEOPLE[picked.author].cat} className={s.infoCat} />
+              <span className={s.infoText}>
+                <span className={s.infoWho}>
+                  {PEOPLE[picked.author].name} ·{' '}
+                  {new Date(picked.created_at).toLocaleDateString('pl-PL', {
+                    day: 'numeric',
+                    month: 'long',
+                  })}
+                </span>
+                {picked.note && <span className={s.infoNote}>{picked.note}</span>}
+              </span>
+              <button
+                className={s.trash}
+                onClick={() => setConfirming(true)}
+                aria-label="Usuń kwiatka"
+              >
+                🗑
+              </button>
+            </span>
+          )
         ) : (
           <span className={s.count}>
             {g.loading ? 'Wczytuję…' : `Kwiatków: ${g.flowers.length}`}

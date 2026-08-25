@@ -70,3 +70,7 @@ create policy "zdjecia wgrywa" on storage.objects
 drop policy if exists "zdjecia nadpisuje" on storage.objects;
 create policy "zdjecia nadpisuje" on storage.objects
   for update using (bucket_id = 'letter') with check (bucket_id = 'letter');
+
+-- Usuwanie kwiatkow (dodane pozniej).
+drop policy if exists "ogrodek plewi" on public.flowers;
+create policy "ogrodek plewi" on public.flowers for delete using (true);
