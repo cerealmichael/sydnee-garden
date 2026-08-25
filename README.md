@@ -75,13 +75,44 @@ Miejsce na łące wybiera `spot.ts`: losuje kilkudziesięciu kandydatów wewnąt
 i bierze tego najdalszego od już zasadzonych. Pozycja zapisuje się razem z kwiatkiem,
 więc potem już się nie rusza.
 
-Włączenie:
+Włączenie wspólnej bazy — krok po kroku (~5 minut, za darmo):
 
-1. Nowy projekt na supabase.com → SQL Editor → wklej `supabase/schema.sql` → Run
-   (skrypt jest idempotentny — po zmianach w apce odpalasz go ponownie)
-2. Project Settings → API: skopiuj URL i klucz `anon`
-3. Vercel → Settings → Environment Variables:
-   `VITE_SUPABASE_URL` i `VITE_SUPABASE_ANON_KEY` → redeploy
+**1. Załóż projekt w Supabase**
+   - supabase.com → Start your project → zaloguj się (można kontem GitHub)
+   - New project: nazwa dowolna (np. `ogrodek`), hasło do bazy wygeneruj i zapisz
+     (apka go nie potrzebuje, ale bez niego nie wejdziesz później do bazy),
+     region **Central EU (Frankfurt)** — najbliżej Polski
+   - poczekaj 1–2 min, aż projekt się postawi
+
+**2. Utwórz tabele**
+   - w projekcie: **SQL Editor** → New query
+   - wklej całą zawartość `supabase/schema.sql` z tego repo → **Run**
+   - ma się pojawić „Success. No rows returned"
+
+**3. Skopiuj klucze**
+   - **Project Settings** (koło zębate) → **API**
+   - `Project URL` — wygląda tak: `https://abcdefgh.supabase.co`
+   - klucz oznaczony **anon / public** (albo „publishable") — długi ciąg znaków
+   - **nie bierz** klucza `service_role` / `secret` — ten daje pełny dostęp do bazy
+     i nie wolno go wkładać do aplikacji, która idzie do przeglądarki
+
+**4. Wpisz je w Vercelu**
+   - projekt w Vercelu → **Settings** → **Environment Variables** → Add Another
+   - `VITE_SUPABASE_URL` = adres z punktu 3, zaznacz **Production**
+   - `VITE_SUPABASE_ANON_KEY` = klucz anon, też **Production**
+
+**5. Zrób redeploy**
+   - **Deployments** → ostatni wpis → menu `⋯` → **Redeploy**
+   - to konieczne: Vite wkleja zmienne do kodu w trakcie builda, więc bez nowego
+     builda apka dalej będzie działać lokalnie
+
+Po wejściu na stronę różowy pasek „Tryb lokalny" ma zniknąć — wtedy pamięć jest wspólna.
+
+**Uwaga:** kwiatki i list zrobione wcześniej zostają w localStorage telefonu i nie
+przeniosą się same do bazy. Trzeba je narysować i napisać jeszcze raz.
+
+Do pracy lokalnej (`npm run dev`) te same dwie zmienne wrzuć do pliku `.env.local`
+w katalogu projektu — wzór jest w `.env.example`.
 
 **Bez tych zmiennych apka nadal działa** — Ogródek chodzi wtedy na localStorage
 (wygodne w dev, ale każda przeglądarka ma swój własny ogródek). Żeby to nie było
