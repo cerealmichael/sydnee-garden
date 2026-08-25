@@ -6,9 +6,17 @@
 export const CATS = {
   classic: 'Kotek',
   donut: 'Kotek z pączkiem',
-  unicorn: 'Kotek jednorożec',
   pizza: 'Kotek z pizzą',
+  watermelon: 'Kotek z arbuzem',
+  unicorn: 'Kotek jednorożec',
   gift: 'Kotek w kokardce',
+  mail: 'Kotek z listem',
+  reading: 'Kotek z książką',
+  guitar: 'Kotek z gitarą',
+  cool: 'Kotek w okularach',
+  fluffy: 'Puchaty kotek',
+  mochi: 'Kotek z mochi',
+  duo: 'Dwa kotki',
 } as const
 
 export type CatName = keyof typeof CATS

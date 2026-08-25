@@ -46,7 +46,8 @@ Ikony przegenerujesz przez `npm run icons` (wymaga `python3`).
 
 ## Grafika
 
-Kotki to PNG-i w `public/cats/` (tło wycięte, przycięte, dłuższy bok 512 px).
+Kotki to PNG-8 z paletą w `public/cats/` (tło wycięte, przycięte, dłuższy bok 448 px,
+128 kolorów — przy płaskich grafikach niewidoczne, a plik schodzi z ~190 kB do ~35 kB).
 Katalog nazw trzyma `src/lib/cats.ts`, wyświetla je `Cat.tsx`, a `CatBadge.tsx` wsadza w kółko.
 
 Dodanie nowego kotka:

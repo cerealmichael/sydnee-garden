@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Przygotowuje grafiki kotkow do public/cats/.
 
-Wejscie: PNG z czarnym tlem (albo juz z alfa). Wyjscie: PNG RGBA, tlo wyciete,
-marginesy przyciete, dluzszy bok przeskalowany do BOX.
+Wejscie: PNG z czarnym tlem (albo juz z alfa). Wyjscie: PNG-8 z paleta i alfa,
+tlo wyciete, marginesy przyciete, dluzszy bok przeskalowany do BOX.
 
   python3 scripts/prep-cats.py <plik.png>:<nazwa> [...]
   np. python3 scripts/prep-cats.py ~/Downloads/kot.png:sleepy
@@ -14,10 +14,11 @@ import sys
 from collections import deque
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pngkit import read_png, resize_rgba, write_png  # noqa: E402
+from pngkit import read_png, resize_rgba, write_png_indexed  # noqa: E402
 
 OUT = 'public/cats'
-BOX = 512     # dluzszy bok wyniku
+BOX = 448     # dluzszy bok wyniku (na iPhone wyswietlamy max ~140 px @3x)
+COLORS = 128  # paleta - plaskie grafiki nic na tym nie traca
 BG_MAX = 62   # kanal <= tyle => kandydat na tlo (kontur kotka ma ~91)
 
 
@@ -81,7 +82,7 @@ def prep(src_path, name):
     small = resize_rgba(rgba, cw, cht, dw, dh)
 
     os.makedirs(OUT, exist_ok=True)
-    size = write_png(f'{OUT}/{name}.png', dw, dh, small)
+    size = write_png_indexed(f'{OUT}/{name}.png', dw, dh, small, COLORS)
     print(f'{name}.png  {dw}x{dh}  {size // 1024}kB')
 
 
