@@ -84,7 +84,8 @@ Włączenie:
    `VITE_SUPABASE_URL` i `VITE_SUPABASE_ANON_KEY` → redeploy
 
 **Bez tych zmiennych apka nadal działa** — Ogródek chodzi wtedy na localStorage
-(wygodne w dev, ale każda przeglądarka ma swój własny ogródek).
+(wygodne w dev, ale każda przeglądarka ma swój własny ogródek). Żeby to nie było
+niespodzianką, na dole huba pojawia się wtedy różowe ostrzeżenie **„Tryb lokalny"**.
 
 Kto jest kim siedzi w `PEOPLE` w `src/lib/person.ts`. Wybór osoby zapisuje się
 w localStorage, więc pytanie pada raz na telefon.
@@ -115,6 +116,30 @@ Suika-like na matter.js. Logika siedzi w `src/game/merge/`:
   pointer events, kolejka 3 następnych, wynik i rekord w localStorage
 
 Dwa jednorożce znikają i dają bonus — jak dwa arbuzy w oryginale.
+
+## Gdy dane się nie synchronizują
+
+Objaw: kwiatek albo list widać na jednym telefonie, a na drugim nie.
+
+Apka sama mówi, co jest grane — pasek na dole huba:
+
+| Co widzisz | Co to znaczy |
+| --- | --- |
+| nic | wszystko gra, dane są wspólne |
+| **Tryb lokalny** | build nie ma kluczy Supabase → wszystko siedzi w localStorage telefonu |
+| **Baza nie odpowiada** | klucze są, ale zapytanie zwraca błąd (brak tabel, złe polityki, zły klucz) |
+
+Przy „Trybie lokalnym" sprawdź po kolei:
+
+1. Vercel → Settings → Environment Variables: czy są `VITE_SUPABASE_URL`
+   i `VITE_SUPABASE_ANON_KEY` **i czy są zaznaczone dla Production**
+2. **Redeploy po dodaniu zmiennych** — Vite wkleja je do kodu na etapie builda,
+   więc sam restart czy odświeżenie strony nic nie da; potrzebny nowy build
+3. Na telefonie: apka dodana do ekranu początkowego trzyma stary kod w service workerze —
+   po redeployu wystarczy raz otworzyć ją przy działającym internecie
+
+Przy „Baza nie odpowiada" wklej ponownie `supabase/schema.sql` (jest idempotentny)
+i sprawdź, czy klucz to `anon`, a nie `service_role`.
 
 ## Grafika
 

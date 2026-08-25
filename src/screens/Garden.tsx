@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Screen from '../components/Screen'
 import Cat from '../components/Cat'
+import CloudBadge from '../components/CloudBadge'
 import DrawPad from '../garden/DrawPad'
 import Meadow from '../garden/Meadow'
 import PersonPicker from '../garden/PersonPicker'
@@ -92,6 +93,7 @@ export default function Garden() {
       </button>
 
       {g.error && <p className={s.error}>{g.error}</p>}
+      <CloudBadge />
 
       {drawing && (
         <DrawPad busy={g.busy} onClose={() => setDrawing(false)} onPlant={plant} />

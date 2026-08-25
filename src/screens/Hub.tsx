@@ -1,6 +1,7 @@
 import Screen from '../components/Screen'
 import Tile from '../components/Tile'
 import CatBadge from '../components/CatBadge'
+import CloudBadge from '../components/CloudBadge'
 import s from './Hub.module.css'
 
 export default function Hub() {
@@ -28,6 +29,8 @@ export default function Hub() {
         />
         <Tile to="/list" title="List" subtitle="Do przeczytania" color="var(--pink)" cat="mail" />
       </nav>
+
+      <CloudBadge />
     </Screen>
   )
 }

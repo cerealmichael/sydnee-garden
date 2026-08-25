@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Screen from '../components/Screen'
 import CatBadge from '../components/CatBadge'
+import CloudBadge from '../components/CloudBadge'
 import GiftBox from '../letter/GiftBox'
 import LetterEditor from '../letter/LetterEditor'
 import { useLetter } from '../letter/useLetter'
@@ -60,6 +61,7 @@ export default function Letter() {
       </button>
 
       {error && <p className={s.error}>{error}</p>}
+      <CloudBadge />
 
       {editing && (
         <LetterEditor
