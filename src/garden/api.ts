@@ -1,20 +1,31 @@
 import { supabase } from '../lib/supabase'
 import type { Person } from '../lib/person'
+import type { Stroke } from './strokes'
 
-export type Watering = { person: Person; day: string }
+export type Flower = {
+  id: string
+  author: Person
+  strokes: Stroke[]
+  /** miejsce na lace, 0..1 */
+  x: number
+  y: number
+  created_at: string
+}
+
+export type NewFlower = Omit<Flower, 'id' | 'created_at'>
 
 export type GardenApi = {
-  list: () => Promise<Watering[]>
-  water: (person: Person, day: string) => Promise<void>
-  /** wola cb, gdy druga osoba podleje - zwraca funkcje odpinajaca */
+  list: () => Promise<Flower[]>
+  plant: (flower: NewFlower) => Promise<void>
+  /** wola cb, gdy druga osoba cos zasadzi - zwraca funkcje odpinajaca */
   subscribe: (cb: () => void) => () => void
 }
 
-const LOCAL_KEY = 'garden:waterings'
+const LOCAL_KEY = 'garden:flowers'
 
-/** Tryb bez Supabase: wszystko siedzi w localStorage tej przegladarki. */
+/** Tryb bez Supabase: ogrodek siedzi w localStorage tej przegladarki. */
 function localGarden(): GardenApi {
-  const read = (): Watering[] => {
+  const read = (): Flower[] => {
     try {
       return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]')
     } catch {
@@ -24,10 +35,9 @@ function localGarden(): GardenApi {
 
   return {
     list: async () => read(),
-    water: async (person, day) => {
+    plant: async (flower) => {
       const all = read()
-      if (all.some((w) => w.person === person && w.day === day)) return
-      all.push({ person, day })
+      all.push({ ...flower, id: crypto.randomUUID(), created_at: new Date().toISOString() })
       try {
         localStorage.setItem(LOCAL_KEY, JSON.stringify(all))
       } catch {
@@ -42,25 +52,24 @@ function supabaseGarden(client: NonNullable<typeof supabase>): GardenApi {
   return {
     list: async () => {
       const { data, error } = await client
-        .from('waterings')
-        .select('person, day')
-        .order('day', { ascending: true })
+        .from('flowers')
+        .select('id, author, strokes, x, y, created_at')
+        .order('created_at', { ascending: true })
       if (error) throw error
-      return (data ?? []) as Watering[]
+      return (data ?? []) as Flower[]
     },
 
-    water: async (person, day) => {
-      const { error } = await client.from('waterings').insert({ person, day })
-      // 23505 = ta osoba juz dzisiaj podlala, to nie jest blad
-      if (error && error.code !== '23505') throw error
+    plant: async (flower) => {
+      const { error } = await client.from('flowers').insert(flower)
+      if (error) throw error
     },
 
     subscribe: (cb) => {
       const channel = client
-        .channel('waterings')
+        .channel('flowers')
         .on(
           'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'waterings' },
+          { event: 'INSERT', schema: 'public', table: 'flowers' },
           () => cb(),
         )
         .subscribe()

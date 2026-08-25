@@ -2,10 +2,9 @@ import type { CatName } from './cats'
 
 export type Person = 'a' | 'b'
 
-/** Podmien imiona i kotki na wlasne. */
 export const PEOPLE: Record<Person, { name: string; cat: CatName; color: string }> = {
-  a: { name: 'Ty', cat: 'classic', color: 'var(--mint)' },
-  b: { name: 'Ona', cat: 'fluffy', color: 'var(--lilac)' },
+  a: { name: 'Tomek', cat: 'classic', color: 'var(--mint)' },
+  b: { name: 'Sydney', cat: 'fluffy', color: 'var(--pink)' },
 }
 
 const KEY = 'garden:person'

@@ -34,14 +34,14 @@ public/
 scripts/pngkit.py        # mini-toolkit PNG (czysty Python, bez zależności)
 scripts/prep-cats.py     # obróbka nowych grafik kotków
 scripts/gen-icons.py     # składanie ikon PWA
-supabase/schema.sql      # tabela waterings + RLS + realtime
+supabase/schema.sql      # tabela flowers + RLS + realtime
 src/
-  garden/                # Ogrodek: api (Supabase/localStorage), hook, roslina, UI
+  garden/                # Ogrodek: DrawPad, Meadow, api, hook, strokes, spot
   game/merge/            # gra: levels, engine (matter.js), render, hook, UI
   screens/               # Hub, Garden, Merge, Letter
   components/            # Screen, TopBar, Tile, Cat, CatBadge, Placeholder, RotateNotice
   lib/cats.ts            # katalog grafik kotków
-  lib/person.ts          # kto podlewa (a/b) + lokalna data
+  lib/person.ts          # kto sadzi (Tomek/Sydney)
   lib/supabase.ts        # klient albo null, gdy brak env
   lib/registerSW.ts
   index.css              # tokeny palety + reset + safe-area
@@ -51,12 +51,16 @@ Ikony przegenerujesz przez `npm run icons` (wymaga `python3`).
 
 ## Ogródek (Supabase)
 
-Wspólna roślina: każde z Was może podlać **raz dziennie**, 14 podlań (2 osoby × 7 dni)
-zamienia roślinę w kwiatek, który ląduje w rzędzie na dole. Streak liczy dni z rzędu,
-w które podlaliście **oboje**. Druga osoba widzi podlanie na żywo (Supabase realtime).
+Rysujesz kwiatka palcem i sadzisz go na wspólnej łące. Kwiatki obu osób stoją obok siebie,
+tapnięcie pokazuje, kto i kiedy zasadził. Druga osoba widzi nowy kwiatek na żywo (realtime).
 
-Cały stan jest liczony z jednej tabeli `waterings` — nie ma osobnego licznika, który
-mógłby się rozjechać.
+Rysunek trzymamy **wektorowo**, nie jako obrazek: każda kreska to kolor, grubość i punkty
+znormalizowane do 0..1 (`src/garden/strokes.ts`). Dzięki temu jeden kwiatek waży ~700 bajtów
+w bazie i skaluje się ostro na każdym ekranie — od miniatury na łące po podgląd.
+
+Miejsce na łące wybiera `spot.ts`: losuje kilkunastu kandydatów wewnątrz elipsy trawy
+i bierze tego najdalszego od już zasadzonych. Pozycja zapisuje się razem z kwiatkiem,
+więc potem już się nie rusza.
 
 Włączenie:
 
@@ -68,8 +72,8 @@ Włączenie:
 **Bez tych zmiennych apka nadal działa** — Ogródek chodzi wtedy na localStorage
 (wygodne w dev, ale każda przeglądarka ma swój własny ogródek).
 
-Kto jest kim (imiona i kotki) siedzi w `PEOPLE` w `src/lib/person.ts` — podmień na własne.
-Wybór osoby zapisuje się w localStorage, więc pytanie pada raz na telefon.
+Kto jest kim siedzi w `PEOPLE` w `src/lib/person.ts`. Wybór osoby zapisuje się
+w localStorage, więc pytanie pada raz na telefon.
 
 ## Pusheen Merge
 
