@@ -34,15 +34,17 @@ public/
 scripts/pngkit.py        # mini-toolkit PNG (czysty Python, bez zależności)
 scripts/prep-cats.py     # obróbka nowych grafik kotków
 scripts/gen-icons.py     # składanie ikon PWA
-supabase/schema.sql      # tabela flowers + RLS + realtime
+supabase/schema.sql      # tabele flowers i letter + bucket na zdjęcia + RLS + realtime
 src/
-  garden/                # Ogrodek: DrawPad, Meadow, api, hook, strokes, spot
+  garden/                # Ogrodek: DrawPad, Meadow, panZoom, api, hook, strokes, spot
+  letter/                # List: edytor, api, hook
   game/merge/            # gra: levels, engine (matter.js), render, hook, UI
   screens/               # Hub, Garden, Merge, Letter
   components/            # Screen, TopBar, Tile, Cat, CatBadge, Placeholder, RotateNotice
   lib/cats.ts            # katalog grafik kotków
   lib/person.ts          # kto sadzi (Tomek/Sydney)
   lib/supabase.ts        # klient albo null, gdy brak env
+  lib/image.ts           # zmniejszanie zdjęć przed wysłaniem
   lib/registerSW.ts
   index.css              # tokeny palety + reset + safe-area
 ```
@@ -54,17 +56,26 @@ Ikony przegenerujesz przez `npm run icons` (wymaga `python3`).
 Rysujesz kwiatka palcem i sadzisz go na wspólnej łące. Kwiatki obu osób stoją obok siebie,
 tapnięcie pokazuje, kto i kiedy zasadził. Druga osoba widzi nowy kwiatek na żywo (realtime).
 
+Do rysowania: 14 pastelowych kolorów + własny (natywny picker, ostatnie 4 zapamiętane),
+4 grubości pędzla (od cienkiego pisaka), cofnij, od nowa i opcjonalna notatka do kwiatka.
+
 Rysunek trzymamy **wektorowo**, nie jako obrazek: każda kreska to kolor, grubość i punkty
 znormalizowane do 0..1 (`src/garden/strokes.ts`). Dzięki temu jeden kwiatek waży ~700 bajtów
 w bazie i skaluje się ostro na każdym ekranie — od miniatury na łące po podgląd.
 
-Miejsce na łące wybiera `spot.ts`: losuje kilkunastu kandydatów wewnątrz elipsy trawy
+**Bez limitu kwiatków**: łąka rośnie razem z ich liczbą (`worldSize` — pierwiastek, bo chodzi
+o powierzchnię), więc gęstość zostaje ta sama. Jeden palec przesuwa, dwa skalują
+(`usePanZoom.ts`), przycisk ⤢ wraca do widoku całości. Transform idzie prosto do stylu,
+z pominięciem Reacta, żeby gest był płynny.
+
+Miejsce na łące wybiera `spot.ts`: losuje kilkudziesięciu kandydatów wewnątrz elipsy trawy
 i bierze tego najdalszego od już zasadzonych. Pozycja zapisuje się razem z kwiatkiem,
 więc potem już się nie rusza.
 
 Włączenie:
 
 1. Nowy projekt na supabase.com → SQL Editor → wklej `supabase/schema.sql` → Run
+   (skrypt jest idempotentny — po zmianach w apce odpalasz go ponownie)
 2. Project Settings → API: skopiuj URL i klucz `anon`
 3. Vercel → Settings → Environment Variables:
    `VITE_SUPABASE_URL` i `VITE_SUPABASE_ANON_KEY` → redeploy
@@ -74,6 +85,15 @@ Włączenie:
 
 Kto jest kim siedzi w `PEOPLE` w `src/lib/person.ts`. Wybór osoby zapisuje się
 w localStorage, więc pytanie pada raz na telefon.
+
+## List
+
+Treść i zdjęcie wpisujesz z poziomu apki — jeden wiersz w tabeli `letter` (id = 1),
+edytowany przez oboje. Zdjęcie przed wysłaniem jest zmniejszane w canvasie do 1600 px
+i przepakowywane na JPEG (`src/lib/image.ts`), więc 4-megabajtowa fotka z telefonu
+schodzi do kilkuset kB. Ląduje w publicznym buckecie `letter` w Supabase Storage.
+
+Bez Supabase treść i zdjęcie (jako data URL) siedzą w localStorage.
 
 ## Pusheen Merge
 

@@ -2,7 +2,7 @@
   flex: none;
   display: grid;
   place-items: center;
-  min-height: 34px;
+  min-height: 38px;
 }
 
 .count {
@@ -14,13 +14,30 @@
 .info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 14px 5px 8px;
+  gap: 9px;
+  max-width: 100%;
+  padding: 6px 16px 6px 8px;
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow);
+}
+
+.infoText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.infoWho {
   font-size: 15px;
   font-weight: 700;
-  background: var(--surface);
-  border-radius: 999px;
-  box-shadow: var(--shadow);
+}
+
+.infoNote {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
 }
 
 .infoCat {

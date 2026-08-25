@@ -7,12 +7,20 @@ import type { Flower } from './api'
 const GRASS = { cx: 0.5, cy: 0.553, rx: 0.47, ry: 0.355 }
 /** Margines, zeby kwiatek nie zwisal z krawedzi. */
 const INSET = 0.82
-const TRIES = 24
+const TRIES = 40
 
 /**
- * Szuka wolnego miejsca na trawie: losuje kilku kandydatow wewnatrz elipsy
- * i bierze tego, ktory jest najdalej od juz zasadzonych kwiatkow. Pozycja
- * zapisuje sie razem z kwiatkiem, wiec potem juz sie nie rusza.
+ * Laka rosnie razem z liczba kwiatkow (pierwiastek, bo chodzi o powierzchnie),
+ * dzieki czemu gestosc zostaje ta sama i nie trzeba zadnego limitu.
+ */
+export function worldSize(count: number) {
+  return Math.min(Math.max(Math.sqrt(count / 6), 1), 3.5)
+}
+
+/**
+ * Szuka wolnego miejsca na trawie: losuje kilkudziesieciu kandydatow wewnatrz
+ * elipsy i bierze tego, ktory jest najdalej od juz zasadzonych kwiatkow.
+ * Pozycja zapisuje sie razem z kwiatkiem, wiec potem juz sie nie rusza.
  */
 export function freeSpot(flowers: Flower[]) {
   let best = { x: GRASS.cx, y: GRASS.cy }

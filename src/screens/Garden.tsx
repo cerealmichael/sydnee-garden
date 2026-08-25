@@ -20,10 +20,10 @@ export default function Garden() {
     setPerson(p)
   }
 
-  const plant = async (strokes: Stroke[]) => {
+  const plant = async (strokes: Stroke[], note: string) => {
     if (!person) return
     // kopiujemy, bo DrawPad trzyma swoje kreski w refie i moze je czyscic
-    const ok = await g.plant(person, strokes.map((st) => ({ ...st, p: [...st.p] })))
+    const ok = await g.plant(person, strokes.map((st) => ({ ...st, p: [...st.p] })), note)
     if (ok) setDrawing(false)
   }
 
@@ -37,11 +37,16 @@ export default function Garden() {
         {picked ? (
           <span className={s.info}>
             <Cat name={PEOPLE[picked.author].cat} className={s.infoCat} />
-            {PEOPLE[picked.author].name} ·{' '}
-            {new Date(picked.created_at).toLocaleDateString('pl-PL', {
-              day: 'numeric',
-              month: 'long',
-            })}
+            <span className={s.infoText}>
+              <span className={s.infoWho}>
+                {PEOPLE[picked.author].name} ·{' '}
+                {new Date(picked.created_at).toLocaleDateString('pl-PL', {
+                  day: 'numeric',
+                  month: 'long',
+                })}
+              </span>
+              {picked.note && <span className={s.infoNote}>{picked.note}</span>}
+            </span>
           </span>
         ) : (
           <span className={s.count}>

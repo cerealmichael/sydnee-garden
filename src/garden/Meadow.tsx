@@ -1,4 +1,6 @@
 import FlowerSvg from './FlowerSvg'
+import { usePanZoom } from './usePanZoom'
+import { worldSize } from './spot'
 import type { Flower } from './api'
 import s from './Meadow.module.css'
 
@@ -8,13 +10,22 @@ type Props = {
   onSelect: (id: string | null) => void
 }
 
-/** Wspolna laka - kwiatki stoja tam, gdzie je zasadzono. */
+/** Bazowy rozmiar laki w px przy jednym "ekranie" - reszta to zoom. */
+const BASE = 900
+
+/** Wspolna laka - kwiatki stoja tam, gdzie je zasadzono. Palec przesuwa, dwa palce skaluja. */
 export default function Meadow({ flowers, selected, onSelect }: Props) {
+  const grow = worldSize(flowers.length)
+  const world = { w: BASE * grow, h: BASE * 0.76 * grow }
+  const { viewportRef, worldRef, fit, wasTap } = usePanZoom({ world })
+
   return (
-    <div className={s.meadow} onPointerDown={() => onSelect(null)}>
-      {/* pole ma staly aspekt 100:76, wiec wspolrzedne kwiatkow (0..1)
-          pokrywaja sie z elipsa trawy niezaleznie od wysokosci ekranu */}
-      <div className={s.field}>
+    <div className={s.viewport} ref={viewportRef} onPointerUp={() => wasTap() && onSelect(null)}>
+      <div
+        className={s.world}
+        ref={worldRef}
+        style={{ width: world.w, height: world.h }}
+      >
         <svg
           viewBox="0 0 100 76"
           preserveAspectRatio="none"
@@ -33,9 +44,11 @@ export default function Meadow({ flowers, selected, onSelect }: Props) {
             style={{
               left: `${flower.x * 100}%`,
               top: `${flower.y * 100}%`,
+              width: `${22 / grow}%`,
               zIndex: Math.round(flower.y * 1000),
             }}
-            onPointerDown={(e) => {
+            onPointerUp={(e) => {
+              if (!wasTap()) return
               e.stopPropagation()
               onSelect(selected === flower.id ? null : flower.id)
             }}
@@ -43,9 +56,13 @@ export default function Meadow({ flowers, selected, onSelect }: Props) {
             <FlowerSvg strokes={flower.strokes} className={s.art} />
           </button>
         ))}
-
-        {flowers.length === 0 && <p className={s.empty}>Pusto. Zasadź pierwszego kwiatka 🌱</p>}
       </div>
+
+      {flowers.length === 0 && <p className={s.empty}>Pusto. Zasadź pierwszego kwiatka 🌱</p>}
+
+      <button className={s.reset} onClick={fit} aria-label="Pokaż całą łąkę">
+        ⤢
+      </button>
     </div>
   )
 }

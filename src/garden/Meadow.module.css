@@ -1,29 +1,20 @@
-.meadow {
+.viewport {
   position: relative;
   flex: 1;
   min-height: 0;
-  display: grid;
-  place-items: center;
-  container-type: size;
   border-radius: var(--r-md);
   background: linear-gradient(180deg, #eaf6ff 0%, #f7fff3 100%);
   box-shadow: var(--shadow);
   overflow: hidden;
-  touch-action: manipulation;
+  touch-action: none;
 }
 
-.field {
-  position: relative;
-  width: 100%;
-  max-height: 100%;
-  aspect-ratio: 100 / 76;
-}
-
-/* gdy ekran jest niski, laka zwezaja sie zamiast lamac proporcje */
-@supports (width: 1cqw) {
-  .field {
-    width: min(100cqw, 131.5cqh);
-  }
+.world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
 }
 
 .ground {
@@ -35,7 +26,6 @@
 
 .flower {
   position: absolute;
-  width: 24%;
   aspect-ratio: 1;
   /* punkt zaczepienia = dol rysunku, czyli koniec lodygi stoi na trawie */
   transform: translate(-50%, -92%);
@@ -56,10 +46,27 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 8%;
+  bottom: 12%;
   text-align: center;
   font-size: 16px;
   font-weight: 600;
   color: var(--ink-soft);
   pointer-events: none;
+}
+
+.reset {
+  position: absolute;
+  z-index: 5;
+  right: 10px;
+  bottom: 10px;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.reset:active {
+  transform: scale(0.92);
 }

@@ -27,12 +27,12 @@ export function useGarden() {
   }, [refresh])
 
   const plant = useCallback(
-    async (author: Person, strokes: Stroke[]) => {
+    async (author: Person, strokes: Stroke[], note: string) => {
       if (busy) return false
       setBusy(true)
       try {
         const { x, y } = freeSpot(flowers)
-        await garden.plant({ author, strokes, x, y })
+        await garden.plant({ author, strokes, note, x, y })
         await refresh()
         return true
       } catch (e) {

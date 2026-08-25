@@ -15,7 +15,8 @@ export type Stroke = {
 /** Punkty blizej niz tyle sa pomijane - mniej danych, ta sama kreska. */
 const MIN_STEP = 0.006
 
-export const MAX_STROKES = 60
+export const MAX_STROKES = 80
+export const NOTE_MAX = 140
 export const MAX_POINTS = 1400
 
 export function addPoint(stroke: Stroke, x: number, y: number) {

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { BRUSHES, PALETTE } from './palette'
-import { addPoint, isEmpty, MAX_STROKES, type Stroke } from './strokes'
+import { BRUSHES, PALETTE, readCustom, saveCustom } from './palette'
+import { addPoint, isEmpty, MAX_STROKES, NOTE_MAX, type Stroke } from './strokes'
 import s from './DrawPad.module.css'
 
 type Props = {
   busy: boolean
   onClose: () => void
-  onPlant: (strokes: Stroke[]) => void
+  onPlant: (strokes: Stroke[], note: string) => void
 }
 
 export default function DrawPad({ busy, onClose, onPlant }: Props) {
@@ -16,8 +16,10 @@ export default function DrawPad({ busy, onClose, onPlant }: Props) {
   const drawingRef = useRef<Stroke | null>(null)
   const sizeRef = useRef(1)
 
+  const [custom, setCustom] = useState<string[]>(readCustom)
   const [color, setColor] = useState<string>(PALETTE[0])
   const [brush, setBrush] = useState(1)
+  const [note, setNote] = useState('')
   const [empty, setEmpty] = useState(true)
 
   const redraw = useCallback(() => {
@@ -128,6 +130,25 @@ export default function DrawPad({ busy, onClose, onPlant }: Props) {
     setEmpty(true)
   }
 
+  const pickCustom = (value: string) => {
+    setColor(value)
+    setCustom((prev) => {
+      const next = [value, ...prev.filter((c) => c !== value)]
+      saveCustom(next)
+      return next.slice(0, 4)
+    })
+  }
+
+  const swatch = (c: string) => (
+    <button
+      key={c}
+      className={c === color ? `${s.color} ${s.picked}` : s.color}
+      style={{ background: c }}
+      onClick={() => setColor(c)}
+      aria-label={`Kolor ${c}`}
+    />
+  )
+
   return (
     <div className={s.sheet}>
       <header className={s.head}>
@@ -143,15 +164,11 @@ export default function DrawPad({ busy, onClose, onPlant }: Props) {
       </div>
 
       <div className={s.colors}>
-        {PALETTE.map((c) => (
-          <button
-            key={c}
-            className={c === color ? `${s.color} ${s.picked}` : s.color}
-            style={{ background: c }}
-            onClick={() => setColor(c)}
-            aria-label={`Kolor ${c}`}
-          />
-        ))}
+        {PALETTE.map(swatch)}
+        {custom.map(swatch)}
+        <label className={s.custom} aria-label="Własny kolor">
+          <input type="color" value={color} onChange={(e) => pickCustom(e.target.value)} />
+        </label>
       </div>
 
       <div className={s.tools}>
@@ -159,11 +176,11 @@ export default function DrawPad({ busy, onClose, onPlant }: Props) {
           {BRUSHES.map((b, i) => (
             <button
               key={b}
-              className={i === brush ? `${s.brush} ${s.picked}` : s.brush}
+              className={i === brush ? `${s.brush} ${s.pickedTool}` : s.brush}
               onClick={() => setBrush(i)}
               aria-label={`Grubość ${i + 1}`}
             >
-              <span style={{ width: 6 + i * 7, height: 6 + i * 7, background: color }} />
+              <span style={{ width: 4 + i * 5, height: 4 + i * 5, background: color }} />
             </button>
           ))}
         </div>
@@ -175,10 +192,18 @@ export default function DrawPad({ busy, onClose, onPlant }: Props) {
         </button>
       </div>
 
+      <input
+        className={s.note}
+        value={note}
+        onChange={(e) => setNote(e.target.value.slice(0, NOTE_MAX))}
+        placeholder="Notatka do kwiatka (opcjonalnie)"
+        maxLength={NOTE_MAX}
+      />
+
       <button
         className={s.plant}
         disabled={empty || busy}
-        onClick={() => onPlant(strokesRef.current)}
+        onClick={() => onPlant(strokesRef.current, note.trim())}
       >
         {busy ? 'Sadzę…' : 'Zasadź 🌱'}
       </button>

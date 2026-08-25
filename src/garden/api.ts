@@ -6,6 +6,8 @@ export type Flower = {
   id: string
   author: Person
   strokes: Stroke[]
+  /** notatka do kwiatka (moze byc pusta) */
+  note: string
   /** miejsce na lace, 0..1 */
   x: number
   y: number
@@ -53,7 +55,7 @@ function supabaseGarden(client: NonNullable<typeof supabase>): GardenApi {
     list: async () => {
       const { data, error } = await client
         .from('flowers')
-        .select('id, author, strokes, x, y, created_at')
+        .select('id, author, strokes, note, x, y, created_at')
         .order('created_at', { ascending: true })
       if (error) throw error
       return (data ?? []) as Flower[]

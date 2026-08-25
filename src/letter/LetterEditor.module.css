@@ -1,0 +1,126 @@
+.sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px calc(12px + var(--sab));
+  background: var(--bg);
+  animation: rise 220ms ease;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.close {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.photoBox {
+  flex: none;
+  display: grid;
+  place-items: center;
+  height: 26dvh;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photoEmpty {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.photoTools {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+.tool {
+  flex: 1;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow);
+}
+
+.tool:disabled {
+  color: var(--ink-soft);
+  box-shadow: none;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--surface);
+  border: none;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+  resize: none;
+}
+
+.body::placeholder {
+  color: var(--ink-soft);
+}
+
+.save {
+  flex: none;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--pink);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow);
+  transition: transform 120ms ease;
+}
+
+.save:active {
+  transform: scale(0.97);
+}
+
+.save:disabled {
+  background: var(--surface);
+  color: var(--ink-soft);
+  box-shadow: none;
+}

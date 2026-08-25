@@ -1,0 +1,67 @@
+.paper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+}
+
+.blank {
+  margin: auto;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+
+.placeholder {
+  margin: auto;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.photo {
+  width: 100%;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+}
+
+.body {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.edit {
+  flex: none;
+  padding: 16px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--pink);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow);
+  transition: transform 120ms ease;
+}
+
+.edit:active {
+  transform: scale(0.97);
+}
+
+.error {
+  flex: none;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #c96a86;
+}
