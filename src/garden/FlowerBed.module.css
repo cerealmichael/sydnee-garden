@@ -1,0 +1,20 @@
+.bed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.flower {
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+
+.more {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-left: 4px;
+}
