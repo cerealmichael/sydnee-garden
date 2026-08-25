@@ -1,0 +1,64 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(74, 66, 88, 0.35);
+  backdrop-filter: blur(3px);
+  animation: fade 200ms ease;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 300px;
+  padding: 22px 20px 20px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.score {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.best {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.again {
+  margin-top: 12px;
+  width: 100%;
+  padding: 14px;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--peach);
+  border-radius: var(--r-sm);
+  transition: transform 120ms ease;
+}
+
+.again:active {
+  transform: scale(0.96);
+}

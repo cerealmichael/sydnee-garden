@@ -13,3 +13,11 @@
   overscroll-behavior: contain;
   padding: 4px 20px calc(20px + var(--sab));
 }
+
+.fill {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  padding: 0 14px calc(10px + var(--sab));
+}

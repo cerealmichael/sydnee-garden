@@ -35,6 +35,7 @@ scripts/pngkit.py        # mini-toolkit PNG (czysty Python, bez zależności)
 scripts/prep-cats.py     # obróbka nowych grafik kotków
 scripts/gen-icons.py     # składanie ikon PWA
 src/
+  game/merge/            # gra: levels, engine (matter.js), render, hook, UI
   screens/               # Hub, Garden, Merge, Letter
   components/            # Screen, TopBar, Tile, Cat, CatBadge, Placeholder, RotateNotice
   lib/cats.ts            # katalog grafik kotków
@@ -43,6 +44,19 @@ src/
 ```
 
 Ikony przegenerujesz przez `npm run icons` (wymaga `python3`).
+
+## Pusheen Merge
+
+Suika-like na matter.js. Logika siedzi w `src/game/merge/`:
+
+- `levels.ts` — drabinka 11 kotków (promień jako ułamek szerokości planszy + punkty)
+- `engine.ts` — świat matter.js, stały krok 1/60, łączenie par po `collisionStart`,
+  wykrywanie przegranej (kotek ponad linią, wyhamowany, przez 900 ms)
+- `render.ts` — rysowanie na canvasie (plansza, linia, celownik, kotki, iskierki)
+- `useMergeGame.ts` — spina to z Reactem: rozmiar (ResizeObserver + dpr), pętla rAF,
+  pointer events, kolejka 3 następnych, wynik i rekord w localStorage
+
+Dwa jednorożce znikają i dają bonus — jak dwa arbuzy w oryginale.
 
 ## Grafika
 

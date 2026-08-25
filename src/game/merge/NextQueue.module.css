@@ -1,0 +1,30 @@
+.queue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow);
+}
+
+.slot {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bg-2);
+}
+
+.first {
+  width: 42px;
+  height: 42px;
+  background: var(--peach);
+}
+
+.cat {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+}
