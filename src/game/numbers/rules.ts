@@ -95,17 +95,51 @@ export const aliveCount = (board: Board) => board.reduce((n, c) => n + (c.done ?
 
 const randomDigit = () => 1 + Math.floor(Math.random() * 9)
 
-/** Nowe rozdanie. Losujemy do skutku, zeby nie zaczynac od martwej planszy. */
-export function dealBoard(rows = START_ROWS): Board {
-  for (let attempt = 0; attempt < 50; attempt++) {
+/** Ile par da sie zlozyc na planszy - miara hojnosci rozdania. */
+export function countPairs(board: Board): number {
+  let n = 0
+  for (let i = 0; i < board.length; i++) {
+    if (board[i].done) continue
+    for (const j of partners(board, i)) {
+      if (fits(board[i].v, board[j].v)) n += 1
+    }
+  }
+  return n
+}
+
+export type Deal = {
+  rows?: number
+  /** widelki na liczbe par w rozdaniu - stad bierze sie poziom trudnosci */
+  minPairs?: number
+  maxPairs?: number
+}
+
+/**
+ * Nowe rozdanie. Losujemy kilkadziesiat plansz i bierzemy pierwsza, ktora trafia
+ * w widelki; gdy zadna nie trafi - te najblizsza. Martwa plansza nigdy nie wyjdzie,
+ * bo o to prosimy w pierwszej kolejnosci.
+ */
+export function dealBoard({ rows = START_ROWS, minPairs = 1, maxPairs = 999 }: Deal = {}): Board {
+  let best: Board | null = null
+  let bestMiss = Infinity
+
+  for (let attempt = 0; attempt < 120; attempt++) {
     const board: Board = Array.from({ length: rows * WIDTH }, () => ({
       v: randomDigit(),
       done: false,
     }))
-    if (findPair(board)) return board
+    const pairs = countPairs(board)
+    if (pairs === 0) continue
+    if (pairs >= minPairs && pairs <= maxPairs) return board
+
+    const miss = pairs < minPairs ? minPairs - pairs : pairs - maxPairs
+    if (miss < bestMiss) {
+      bestMiss = miss
+      best = board
+    }
   }
-  // praktycznie nieosiagalne, ale niech funkcja zawsze cos zwroci
-  return Array.from({ length: rows * WIDTH }, () => ({ v: 5, done: false }))
+
+  return best ?? Array.from({ length: rows * WIDTH }, (_, i) => ({ v: (i % 9) + 1, done: false }))
 }
 
 /**

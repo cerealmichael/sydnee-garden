@@ -1,10 +1,12 @@
 import CatBadge from '../../components/CatBadge'
 import { PEOPLE, type Person } from '../../lib/person'
 import type { Bests } from './api'
+import { LEVELS, type Level } from './levels'
 import type { HistoryEntry } from './storage'
 import s from './GameOverCard.module.css'
 
 type Props = {
+  level: Level
   score: number
   best: number
   /** rekord sprzed tej partii */
@@ -14,13 +16,17 @@ type Props = {
   /** null = jeszcze nie wiadomo, kto gra na tym telefonie */
   person: Person | null
   onClaim: (who: Person) => void
-  onRestart: () => void
+  /** jeszcze raz na tym samym poziomie */
+  onAgain: () => void
+  /** powrot do wyboru poziomu */
+  onMenu: () => void
 }
 
 const day = (iso: string) =>
   new Date(iso).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })
 
 export default function GameOverCard({
+  level,
   score,
   best,
   prevBest,
@@ -28,7 +34,8 @@ export default function GameOverCard({
   bests,
   person,
   onClaim,
-  onRestart,
+  onAgain,
+  onMenu,
 }: Props) {
   const record = score > prevBest && score > 0
   const people = Object.keys(PEOPLE) as Person[]
@@ -45,7 +52,7 @@ export default function GameOverCard({
         <h2 className={s.title}>{record ? 'Nowy rekord!' : 'Koniec!'}</h2>
         <p className={s.score}>{score}</p>
         <p className={s.best}>
-          {record ? `Poprzedni rekord: ${prevBest}` : `Twój rekord: ${best}`}
+          {LEVELS[level].label} · {record ? `poprzedni rekord: ${prevBest}` : `Twój rekord: ${best}`}
         </p>
 
         {person === null ? (
@@ -86,8 +93,11 @@ export default function GameOverCard({
           </p>
         )}
 
-        <button className={s.again} onClick={onRestart}>
+        <button className={s.again} onClick={onAgain}>
           Jeszcze raz
+        </button>
+        <button className={s.menu} onClick={onMenu}>
+          Zmień poziom
         </button>
       </div>
     </div>

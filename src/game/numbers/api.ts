@@ -1,26 +1,30 @@
 /**
  * Wspolna tablica wynikow. Z Supabase oboje widzicie swoje rekordy obok siebie;
  * bez kluczy leci to samo po localStorage, tyle ze widac tylko siebie.
+ * Kazdy poziom trudnosci ma wlasna tablice.
  */
 
 import { supabase } from '../../lib/supabase'
 import type { Person } from '../../lib/person'
+import type { Level } from './levels'
 
-/** Nazwa gry w tabeli - jedna tabela obsluzy tez nastepne gry. */
-const GAME = 'numbers'
+/** Nazwa gry w tabeli - jedna tabela obsluzy tez nastepne gry i poziomy. */
+const game = (level: Level) => `numba-match:${level}`
 
 export type Bests = Partial<Record<Person, number>>
 
 export type ScoresApi = {
-  /** najlepszy wynik kazdej osoby */
-  bests: () => Promise<Bests>
-  submit: (author: Person, score: number) => Promise<void>
+  /** najlepszy wynik kazdej osoby na tym poziomie */
+  bests: (level: Level) => Promise<Bests>
+  submit: (level: Level, author: Person, score: number) => Promise<void>
 }
 
 const LOCAL_KEY = 'numbers:bests'
 
+type LocalBests = Partial<Record<Level, Bests>>
+
 function localScores(): ScoresApi {
-  const read = (): Bests => {
+  const read = (): LocalBests => {
     try {
       return JSON.parse(localStorage.getItem(LOCAL_KEY) || '{}')
     } catch {
@@ -29,12 +33,16 @@ function localScores(): ScoresApi {
   }
 
   return {
-    bests: async () => read(),
-    submit: async (author, score) => {
+    bests: async (level) => read()[level] ?? {},
+    submit: async (level, author, score) => {
       const all = read()
-      if (score <= (all[author] ?? 0)) return
+      const forLevel = all[level] ?? {}
+      if (score <= (forLevel[author] ?? 0)) return
       try {
-        localStorage.setItem(LOCAL_KEY, JSON.stringify({ ...all, [author]: score }))
+        localStorage.setItem(
+          LOCAL_KEY,
+          JSON.stringify({ ...all, [level]: { ...forLevel, [author]: score } }),
+        )
       } catch {
         /* trudno */
       }
@@ -44,11 +52,11 @@ function localScores(): ScoresApi {
 
 function supabaseScores(client: NonNullable<typeof supabase>): ScoresApi {
   return {
-    bests: async () => {
+    bests: async (level) => {
       const { data, error } = await client
         .from('scores')
         .select('author, score')
-        .eq('game', GAME)
+        .eq('game', game(level))
         .order('score', { ascending: false })
       if (error) throw error
 
@@ -60,8 +68,8 @@ function supabaseScores(client: NonNullable<typeof supabase>): ScoresApi {
       return out
     },
 
-    submit: async (author, score) => {
-      const { error } = await client.from('scores').insert({ game: GAME, author, score })
+    submit: async (level, author, score) => {
+      const { error } = await client.from('scores').insert({ game: game(level), author, score })
       if (error) throw error
     },
   }
