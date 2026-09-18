@@ -1,6 +1,8 @@
 .overlay {
-  position: absolute;
+  /* fixed, bo picker wchodzi tez na ekranach, ktore scrolluja (hub) */
+  position: fixed;
   inset: 0;
+  z-index: 3;
   display: grid;
   place-items: center;
   padding: 20px;

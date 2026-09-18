@@ -23,7 +23,7 @@ export default function Tools({ addsLeft, stuck, disabled, onAdd, onHint, onRest
   if (confirming) {
     return (
       <div className={s.tools}>
-        <span className={s.ask}>Zaczynamy od nowa?</span>
+        <span className={s.ask}>Wrócić do wyboru poziomu?</span>
         <button
           className={s.yes}
           onClick={() => {
@@ -57,7 +57,7 @@ export default function Tools({ addsLeft, stuck, disabled, onAdd, onHint, onRest
         <span className={s.name}>Podpowiedź</span>
       </button>
 
-      <button className={s.restart} onClick={() => setConfirming(true)} aria-label="Od nowa">
+      <button className={s.restart} onClick={() => setConfirming(true)} aria-label="Wybór poziomu">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
           <path
             d="M19 12a7 7 0 1 1-2.1-5"

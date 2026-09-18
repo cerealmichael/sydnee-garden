@@ -18,7 +18,8 @@ export default function App() {
           <Route path="/" element={<Hub />} />
           <Route path="/ogrodek" element={<Garden />} />
           <Route path="/merge" element={<Merge />} />
-          <Route path="/dziesiatki" element={<Numbers />} />
+          <Route path="/numba-match" element={<Numbers />} />
+          <Route path="/dziesiatki" element={<Navigate to="/numba-match" replace />} />
           <Route path="/list" element={<Letter />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

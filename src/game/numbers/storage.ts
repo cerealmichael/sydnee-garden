@@ -1,18 +1,21 @@
 /**
  * Pamiec gry na tym urzadzeniu: niedokonczona partia, rekord i kilka ostatnich
- * wynikow. Wszystko w localStorage, wiec kazdy zapis jest w try/catch -
- * w prywatnym oknie Safari te wywala wyjatkiem.
+ * wynikow. Rekordy i historia sa osobne dla kazdego poziomu - inaczej trudny
+ * nigdy by z latwym nie wygral. Wszystko w localStorage, wiec kazdy zapis jest
+ * w try/catch: w prywatnym oknie Safari te wywala wyjatkiem.
  */
 
+import { isLevel, type Level } from './levels'
 import type { Board } from './rules'
 
 const STATE_KEY = 'numbers:state'
-const BEST_KEY = 'numbers:best'
-const HISTORY_KEY = 'numbers:history'
+const bestKey = (level: Level) => `numbers:best:${level}`
+const historyKey = (level: Level) => `numbers:history:${level}`
 
 const HISTORY_LIMIT = 8
 
 export type SavedGame = {
+  level: Level
   board: Board
   score: number
   streak: number
@@ -30,6 +33,7 @@ export function readGame(): SavedGame | null {
     const raw = localStorage.getItem(STATE_KEY)
     if (!raw) return null
     const data = JSON.parse(raw) as SavedGame
+    if (!isLevel(data.level)) return null
     if (!Array.isArray(data.board) || data.board.length === 0) return null
     if (typeof data.score !== 'number' || typeof data.addsLeft !== 'number') return null
     return data
@@ -54,25 +58,25 @@ export function forgetGame() {
   }
 }
 
-export function readBest(): number {
+export function readBest(level: Level): number {
   try {
-    return Number(localStorage.getItem(BEST_KEY)) || 0
+    return Number(localStorage.getItem(bestKey(level))) || 0
   } catch {
     return 0
   }
 }
 
-export function saveBest(score: number) {
+export function saveBest(level: Level, score: number) {
   try {
-    localStorage.setItem(BEST_KEY, String(score))
+    localStorage.setItem(bestKey(level), String(score))
   } catch {
     /* trudno */
   }
 }
 
-export function readHistory(): HistoryEntry[] {
+export function readHistory(level: Level): HistoryEntry[] {
   try {
-    const data = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]')
+    const data = JSON.parse(localStorage.getItem(historyKey(level)) || '[]')
     return Array.isArray(data) ? (data as HistoryEntry[]) : []
   } catch {
     return []
@@ -80,10 +84,13 @@ export function readHistory(): HistoryEntry[] {
 }
 
 /** Dopisuje wynik na poczatek i przycina liste. Zwraca nowa historie. */
-export function pushHistory(score: number): HistoryEntry[] {
-  const next = [{ score, at: new Date().toISOString() }, ...readHistory()].slice(0, HISTORY_LIMIT)
+export function pushHistory(level: Level, score: number): HistoryEntry[] {
+  const next = [{ score, at: new Date().toISOString() }, ...readHistory(level)].slice(
+    0,
+    HISTORY_LIMIT,
+  )
   try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(next))
+    localStorage.setItem(historyKey(level), JSON.stringify(next))
   } catch {
     /* trudno */
   }

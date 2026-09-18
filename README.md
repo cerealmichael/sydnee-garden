@@ -39,7 +39,7 @@ src/
   garden/                # Ogrodek: DrawPad, Meadow, panZoom, api, hook, strokes, spot
   letter/                # List: edytor, api, hook
   game/merge/            # gra: levels, engine (matter.js), render, hook, UI
-  game/numbers/          # Dziesiątki: rules, scoring, storage, api, hook, UI
+  game/numbers/          # Numba Match: rules, levels, scoring, storage, api, hook, UI
   screens/               # Hub, Garden, Merge, Numbers, Letter
   components/            # Screen, TopBar, Tile, Cat, CatBadge, Placeholder, RotateNotice
   lib/cats.ts            # katalog grafik kotków
@@ -149,7 +149,7 @@ Suika-like na matter.js. Logika siedzi w `src/game/merge/`:
 
 Dwa jednorożce znikają i dają bonus — jak dwa arbuzy w oryginale.
 
-## Dziesiątki
+## Numba Match
 
 Plansza 9 cyfr w rzędzie, czyta się ją jak tekst. Łączysz **dwie takie same cyfry
 albo dwie dające w sumie 10**, o ile są sąsiadami: w rzędzie, w kolumnie, na skosie
@@ -162,26 +162,53 @@ Logika siedzi w `src/game/numbers/`:
 
 - `rules.ts` — plansza jako jedna tablica komórek: sąsiedztwo, szukanie pary
   (służy i za podpowiedź, i za test „koniec gry?"), skreślanie, dosypywanie
+- `levels.ts` — poziomy trudności w jednym miejscu
 - `scoring.ts` — punktacja w jednym miejscu, do kręcenia gałkami
 - `storage.ts` — niedokończona partia, rekord i osiem ostatnich wyników (localStorage)
 - `api.ts` — wspólna tablica rekordów (Supabase albo localStorage)
 - `useNumbersGame.ts` — spina to z Reactem: zaznaczanie, seria, nastrój kotka
-- `Board.tsx`, `Hud.tsx`, `Tools.tsx`, `GameOverCard.tsx` — UI
+- `StartCard.tsx`, `Board.tsx`, `Hud.tsx`, `Tools.tsx`, `GameOverCard.tsx` — UI
 
-Punktacja: para 10 pkt, a co trzecia para z rzędu podbija mnożnik aż do ×5 —
-dosypanie cyfr i podpowiedź zerują serię (podpowiedź kosztuje jeszcze 5 pkt).
-Do tego 50 pkt za każdy rząd, który zniknął, 200 za wyczyszczenie całej planszy
-(dostajesz wtedy świeże rozdanie i znów 5 dosypań) i 25 za każde niewykorzystane
-dosypanie na koniec. Koniec gry jest wtedy, gdy nie ma żadnej pary i nie ma już
-czym dosypać.
+### Poziomy trudności
+
+Wejście na grę zaczyna się od wyboru poziomu (rekord każdego widać obok nazwy).
+Trudniej **nie** robi się większa plansza — w tej grze więcej cyfr to więcej
+możliwości, więc byłoby odwrotnie. Zamiast tego:
+
+| | Łatwy | Trudny |
+| --- | --- | --- |
+| dosypania | 5 | 3 |
+| podpowiedź | −5 pkt | −15 pkt |
+| rozdanie startowe | ≥ 16 par | ≤ 10 par |
+
+Rozdanie „chude" albo „hojne" robi `dealBoard`: losuje do 120 plansz i bierze
+pierwszą, która trafia w widelki poziomu (mediana surowego rozdania to ~16 par,
+poniżej 11 par trafia się ~7% losowań). Martwa plansza nigdy nie wyjdzie.
+W symulacji po 300 partii wychodzi ~4900 pkt średnio na łatwym i ~1650 na trudnym,
+dlatego **rekordy i historia są osobne dla każdego poziomu**.
+
+### Punktacja
+
+Para 10 pkt, a co trzecia para z rzędu podbija mnożnik aż do ×5 — dosypanie cyfr
+i podpowiedź zerują serię. Do tego 50 pkt za każdy rząd, który zniknął, 200 za
+wyczyszczenie całej planszy (dostajesz wtedy świeże rozdanie i znów komplet dosypań)
+i 25 za każde niewykorzystane dosypanie na koniec. Koniec gry jest wtedy, gdy nie ma
+żadnej pary i nie ma już czym dosypać.
 
 Kotek w pasku zdradza, jak leci: spokojny, w okularach przy serii, jednorożec przy
 dużym mnożniku i zmartwiony, gdy na planszy nie ma już żadnej pary. Dosypywanie
 i podpowiedź to też kotki — ten w kokardce nosi licznik dosypań.
 
+### Wyniki we dwoje
+
 Partia wraca po zamknięciu apki (localStorage), a skończony wynik ląduje w tabeli
-`scores` w Supabase, więc na karcie końca gry widać rekordy obojga. Jeśli apka nie
-wie jeszcze, kto gra, pyta o to raz — właśnie na tej karcie.
+`scores` w Supabase — osobno dla każdego poziomu (`game` = `numba-match:easy`
+albo `numba-match:hard`). Dzięki temu na karcie końca gry widać rekordy obojga.
+
+Kto siedzi przy danym telefonie, ustawia się raz: przycisk **„Kto gra na tym
+telefonie?"** na dole huba (to samo pytanie pada na karcie końca gry, jeśli apka
+jeszcze nie wie). Wybór idzie do localStorage, więc każdy telefon ma swoją osobę
+na stałe — imiona siedzą w `PEOPLE` w `src/lib/person.ts`.
 
 ## Gdy dane się nie synchronizują
 
