@@ -34,12 +34,13 @@ public/
 scripts/pngkit.py        # mini-toolkit PNG (czysty Python, bez zależności)
 scripts/prep-cats.py     # obróbka nowych grafik kotków
 scripts/gen-icons.py     # składanie ikon PWA
-supabase/schema.sql      # tabele flowers i letter + bucket na zdjęcia + RLS + realtime
+supabase/schema.sql      # tabele flowers, letter i scores + bucket na zdjęcia + RLS + realtime
 src/
   garden/                # Ogrodek: DrawPad, Meadow, panZoom, api, hook, strokes, spot
   letter/                # List: edytor, api, hook
   game/merge/            # gra: levels, engine (matter.js), render, hook, UI
-  screens/               # Hub, Garden, Merge, Letter
+  game/numbers/          # Dziesiątki: rules, scoring, storage, api, hook, UI
+  screens/               # Hub, Garden, Merge, Numbers, Letter
   components/            # Screen, TopBar, Tile, Cat, CatBadge, Placeholder, RotateNotice
   lib/cats.ts            # katalog grafik kotków
   lib/person.ts          # kto sadzi (Tomek/Sydney)
@@ -147,6 +148,40 @@ Suika-like na matter.js. Logika siedzi w `src/game/merge/`:
   pointer events, kolejka 3 następnych, wynik i rekord w localStorage
 
 Dwa jednorożce znikają i dają bonus — jak dwa arbuzy w oryginale.
+
+## Dziesiątki
+
+Plansza 9 cyfr w rzędzie, czyta się ją jak tekst. Łączysz **dwie takie same cyfry
+albo dwie dające w sumie 10**, o ile są sąsiadami: w rzędzie, w kolumnie, na skosie
+lub po prostu jedna po drugiej w kolejności czytania (koniec rzędu łączy się
+z początkiem następnego). Skreślone cyfry zostają wyblakłe na planszy, ale przestają
+liczyć się do sąsiedztwa — dlatego czyszczenie otwiera nowe ścieżki. Pusty rząd
+znika w całości.
+
+Logika siedzi w `src/game/numbers/`:
+
+- `rules.ts` — plansza jako jedna tablica komórek: sąsiedztwo, szukanie pary
+  (służy i za podpowiedź, i za test „koniec gry?"), skreślanie, dosypywanie
+- `scoring.ts` — punktacja w jednym miejscu, do kręcenia gałkami
+- `storage.ts` — niedokończona partia, rekord i osiem ostatnich wyników (localStorage)
+- `api.ts` — wspólna tablica rekordów (Supabase albo localStorage)
+- `useNumbersGame.ts` — spina to z Reactem: zaznaczanie, seria, nastrój kotka
+- `Board.tsx`, `Hud.tsx`, `Tools.tsx`, `GameOverCard.tsx` — UI
+
+Punktacja: para 10 pkt, a co trzecia para z rzędu podbija mnożnik aż do ×5 —
+dosypanie cyfr i podpowiedź zerują serię (podpowiedź kosztuje jeszcze 5 pkt).
+Do tego 50 pkt za każdy rząd, który zniknął, 200 za wyczyszczenie całej planszy
+(dostajesz wtedy świeże rozdanie i znów 5 dosypań) i 25 za każde niewykorzystane
+dosypanie na koniec. Koniec gry jest wtedy, gdy nie ma żadnej pary i nie ma już
+czym dosypać.
+
+Kotek w pasku zdradza, jak leci: spokojny, w okularach przy serii, jednorożec przy
+dużym mnożniku i zmartwiony, gdy na planszy nie ma już żadnej pary. Dosypywanie
+i podpowiedź to też kotki — ten w kokardce nosi licznik dosypań.
+
+Partia wraca po zamknięciu apki (localStorage), a skończony wynik ląduje w tabeli
+`scores` w Supabase, więc na karcie końca gry widać rekordy obojga. Jeśli apka nie
+wie jeszcze, kto gra, pyta o to raz — właśnie na tej karcie.
 
 ## Gdy dane się nie synchronizują
 
