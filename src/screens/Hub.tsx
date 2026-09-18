@@ -27,6 +27,13 @@ export default function Hub() {
           color="var(--peach)"
           cat="donut"
         />
+        <Tile
+          to="/dziesiatki"
+          title="Dziesiątki"
+          subtitle="Łącz pary cyfr"
+          color="var(--sky)"
+          cat="cool"
+        />
         <Tile to="/list" title="List" subtitle="Do przeczytania" color="var(--pink)" cat="mail" />
       </nav>
 

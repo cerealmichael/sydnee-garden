@@ -61,6 +61,28 @@ drop policy if exists "list poprawia" on public.letter;
 create policy "list poprawia" on public.letter for update using (id = 1) with check (id = 1);
 
 
+-- --- Wyniki gier: jeden wiersz = jedna skonczona partia ---------------------
+-- Kolumna "game" jest po to, zeby nastepne gry nie potrzebowaly nowej tabeli.
+
+create table if not exists public.scores (
+  id uuid primary key default gen_random_uuid(),
+  game text not null,
+  author text not null check (author in ('a', 'b')),
+  score integer not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists scores_game_score_idx on public.scores (game, score desc);
+
+alter table public.scores enable row level security;
+
+drop policy if exists "wyniki czyta" on public.scores;
+create policy "wyniki czyta" on public.scores for select using (true);
+
+drop policy if exists "wyniki dopisuje" on public.scores;
+create policy "wyniki dopisuje" on public.scores for insert with check (true);
+
+
 -- --- Realtime: druga osoba widzi zmiany od razu -----------------------------
 -- "alter publication ... add table" wywala się, gdy tabela już tam jest,
 -- więc najpierw sprawdzamy.

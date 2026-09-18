@@ -1,0 +1,95 @@
+.wrap {
+  /* plansza jest tak wysoka jak rzedy, a gdy ich przybedzie - scrolluje sie */
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  margin-bottom: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 8px;
+  border-radius: var(--r-md);
+  border: 4px solid var(--sky);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.grid {
+  display: grid;
+  gap: 3px;
+}
+
+.cell {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  /* 9 kolumn na telefonie: cyfra ma byc gruba i wypelniac kafelek */
+  font-size: clamp(15px, 4.4vw, 26px);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--bg-2);
+  border-radius: 10px;
+  transition:
+    transform 120ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.cell:active:not(.done) {
+  transform: scale(0.9);
+}
+
+.done {
+  color: rgba(154, 146, 173, 0.35);
+  background: transparent;
+}
+
+.sel {
+  color: var(--ink);
+  background: var(--sky);
+  transform: scale(1.08);
+  box-shadow: var(--shadow-press);
+}
+
+.hint {
+  animation: blink 700ms ease-in-out 3;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    background: var(--bg-2);
+  }
+  50% {
+    background: var(--butter);
+    transform: scale(1.08);
+  }
+}
+
+.flash {
+  animation: pop 260ms ease forwards;
+}
+
+@keyframes pop {
+  0% {
+    background: var(--mint);
+    transform: scale(1.12);
+  }
+  100% {
+    background: transparent;
+    transform: scale(1);
+  }
+}
+
+.new {
+  animation: drop 280ms ease;
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}

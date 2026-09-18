@@ -1,0 +1,7 @@
+.footer {
+  flex: none;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
