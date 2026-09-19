@@ -169,6 +169,27 @@ Logika siedzi w `src/game/numbers/`:
 - `useNumbersGame.ts` — spina to z Reactem: zaznaczanie, seria, nastrój kotka
 - `StartCard.tsx`, `Board.tsx`, `Hud.tsx`, `Tools.tsx`, `GameOverCard.tsx` — UI
 
+### Każdą planszę da się wyczyścić do zera
+
+Rozdanie ma 4 rzędy, czyli **36 cyfr — parzyście**. To nie kosmetyka: przy
+nieparzystej liczbie (np. 27) jedna cyfra zostanie choćby przy idealnej grze,
+bo pary zjadają po dwie.
+
+Cyfry losujemy **parami** (`pairedDigits`): dwie takie same albo dwie do dziesięciu,
+a potem tasujemy. Przy niezależnym losowaniu multizbiór często nie daje się
+sparować — wystarczy nieparzysta liczba piątek — i plansza jest nie do wyczyszczenia,
+choć wygląda niewinnie.
+
+Sam multizbiór to jednak za mało, bo liczy się jeszcze geometria (co z czym
+sąsiaduje po drodze). Dlatego `dealBoard` puszcza na każdym kandydacie 40 losowych
+rozgrywek i bierze tylko taką planszę, którą **któraś z nich sprzątnęła do zera** —
+znaleziona linia jest dowodem, że da się przejść bez dosypywania. Kosztuje to
+6–10 ms na rozdanie.
+
+Sprawdzone konstrukcyjnie: 120/120 rozdań (60 łatwych + 60 trudnych) dało się
+wyczyścić do zera; mediana prób potrzebnych do ponownego znalezienia linii to 3
+na łatwym i 15 na trudnym.
+
 ### Poziomy trudności
 
 Wejście na grę zaczyna się od wyboru poziomu (rekord każdego widać obok nazwy).
@@ -179,21 +200,32 @@ możliwości, więc byłoby odwrotnie. Zamiast tego:
 | --- | --- | --- |
 | dosypania | 5 | 3 |
 | podpowiedź | −5 pkt | −15 pkt |
-| rozdanie startowe | ≥ 16 par | ≤ 10 par |
+| wyrozumiałość planszy | ≥ 0.25 | ≤ 0.08 |
 
-Rozdanie „chude" albo „hojne" robi `dealBoard`: losuje do 120 plansz i bierze
-pierwszą, która trafia w widelki poziomu (mediana surowego rozdania to ~16 par,
-poniżej 11 par trafia się ~7% losowań). Martwa plansza nigdy nie wyjdzie.
-W symulacji po 300 partii wychodzi ~4900 pkt średnio na łatwym i ~1650 na trudnym,
-dlatego **rekordy i historia są osobne dla każdego poziomu**.
+Wyrozumiałość (`winRate`) to udział losowych rozgrywek, które sprzątają całą
+planszę. Wysoka = mnóstwo linii prowadzi do celu, więc trudno się zablokować.
+Niska = linia istnieje, ale trzeba przy niej pomyśleć. W praktyce wychodzi ~0.34
+na łatwym i ~0.07 na trudnym, a w symulacji 150 partii losowej gry: ~8200 pkt
+i 150 ruchów na łatwym wobec ~2100 pkt i 50 ruchów na trudnym — dlatego
+**rekordy i historia są osobne dla każdego poziomu**.
 
 ### Punktacja
 
 Para 10 pkt, a co trzecia para z rzędu podbija mnożnik aż do ×5 — dosypanie cyfr
 i podpowiedź zerują serię. Do tego 50 pkt za każdy rząd, który zniknął, 200 za
-wyczyszczenie całej planszy (dostajesz wtedy świeże rozdanie i znów komplet dosypań)
-i 25 za każde niewykorzystane dosypanie na koniec. Koniec gry jest wtedy, gdy nie ma
-żadnej pary i nie ma już czym dosypać.
+wyczyszczenie całej planszy (dostajesz wtedy świeże rozdanie i **jedno** dosypanie
+z powrotem) i 25 za każde niewykorzystane dosypanie na koniec. Koniec gry jest
+wtedy, gdy nie ma żadnej pary i nie ma już czym dosypać.
+
+Oddawanie kompletu dosypań za każdą wyczyszczoną planszę robiło z tego grę bez
+końca — w symulacji średnio 356 ruchów na partię (rekordowa: 2078). Przy jednym
+dosypaniu wychodzi 161, czyli kilka minut stukania.
+
+**Dosypanie zawsze daje ruch.** Sama kopia tego nie gwarantuje: jedyną pewną nową
+stycznością jest ostatnia żywa cyfra obok kopii pierwszej, a to nie musi być para.
+Dlatego gdy po dosypaniu nadal nie ma pary, dokładamy jeszcze jedną kopię ostatniej
+cyfry — ląduje tuż za kopią tej samej cyfry, więc para jest pewna. Przetestowane na
+ponad 500 dosypaniach w symulacji: każde dało ruch.
 
 Kotek w pasku zdradza, jak leci: spokojny, w okularach przy serii, jednorożec przy
 dużym mnożniku i zmartwiony, gdy na planszy nie ma już żadnej pary. Dosypywanie

@@ -175,11 +175,12 @@ export function useNumbersGame() {
       let addsLeft = g.addsLeft
       let board = next
 
-      // pusta plansza: premia, swieze rozdanie i dosypywanie od nowa
+      // pusta plansza: premia, swieze rozdanie i jedno dosypanie z powrotem
+      // (komplet co plansze robil z tego gre bez konca - patrz symulacja w README)
       if (aliveCount(board) === 0) {
         score += SWEEP
         board = deal(g.level)
-        addsLeft = LEVELS[g.level].adds
+        addsLeft = Math.min(LEVELS[g.level].adds, addsLeft + 1)
       }
 
       return settle({
