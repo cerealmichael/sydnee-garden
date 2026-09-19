@@ -9,8 +9,8 @@
  */
 
 export const WIDTH = 9
-export const START_ROWS = 3
-export const MAX_ADDS = 5
+/** parzysta liczba cyfr, inaczej jedna zawsze zostanie na planszy */
+export const START_ROWS = 4
 
 export type Cell = {
   /** cyfra 1..9 */
@@ -93,53 +93,126 @@ export function findPair(board: Board): Pair | null {
 
 export const aliveCount = (board: Board) => board.reduce((n, c) => n + (c.done ? 0 : 1), 0)
 
-const randomDigit = () => 1 + Math.floor(Math.random() * 9)
-
-/** Ile par da sie zlozyc na planszy - miara hojnosci rozdania. */
-export function countPairs(board: Board): number {
-  let n = 0
+/** Wszystkie pary, ktore da sie teraz zlozyc. */
+export function allPairs(board: Board): Pair[] {
+  const out: Pair[] = []
   for (let i = 0; i < board.length; i++) {
     if (board[i].done) continue
     for (const j of partners(board, i)) {
-      if (fits(board[i].v, board[j].v)) n += 1
+      if (fits(board[i].v, board[j].v)) out.push([i, j])
     }
   }
-  return n
+  return out
+}
+
+function shuffle<T>(items: T[]): T[] {
+  const a = [...items]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+/**
+ * Cyfry do rozdania losowane **parami**: albo dwie takie same, albo dwie do 10.
+ * Dzieki temu caly multizbior da sie sparowac - przy niezaleznym losowaniu bardzo
+ * czesto sie nie da (np. nieparzysta liczba piatek) i wyczyszczenie planszy jest
+ * niemozliwe, choc plansza wyglada niewinnie. Potem tasujemy, wiec ulozenie jest
+ * dalej losowe; gwarancja dotyczy tylko tego, co jest na planszy.
+ */
+function pairedDigits(cells: number): number[] {
+  const out: number[] = []
+  while (out.length < cells) {
+    const d = 1 + Math.floor(Math.random() * 9)
+    // polowa par "takie same", polowa "do dziesieciu" (dla 5 to i tak to samo)
+    out.push(d, Math.random() < 0.5 ? d : 10 - d)
+  }
+  return shuffle(out.slice(0, cells))
+}
+
+/** Jedna losowa rozgrywka do konca - zwraca, ile cyfr zostalo na planszy. */
+function playout(start: Board): number {
+  let board = start
+
+  for (let guard = 0; guard < 500; guard++) {
+    const pairs = allPairs(board)
+    if (pairs.length === 0) break
+    const [a, b] = pairs[Math.floor(Math.random() * pairs.length)]
+    board = clearPair(board, a, b).board
+  }
+
+  return aliveCount(board)
+}
+
+export type Solvability = {
+  /** najlepszy wynik z prob: ile cyfr zostalo w najlepszej rozgrywce */
+  left: number
+  /** jaka czesc losowych rozgrywek wyczyscila plansze do zera */
+  winRate: number
+}
+
+/**
+ * Jak bardzo plansza wybacza. Puszczamy kilkadziesiat losowych rozgrywek bez
+ * dosypywania: `left === 0` znaczy, ze istnieje linia czyszczaca wszystko,
+ * a `winRate` mowi, jak latwo na nia trafic - stad bierze sie poziom trudnosci.
+ */
+export function solvability(board: Board, tries = 40): Solvability {
+  let left = Infinity
+  let wins = 0
+
+  for (let i = 0; i < tries; i++) {
+    const rest = playout(board)
+    if (rest === 0) wins += 1
+    if (rest < left) left = rest
+  }
+
+  return { left, winRate: wins / tries }
 }
 
 export type Deal = {
   rows?: number
-  /** widelki na liczbe par w rozdaniu - stad bierze sie poziom trudnosci */
-  minPairs?: number
-  maxPairs?: number
+  /** ile losowych rozgrywek sprawdzamy na kandydacie */
+  tries?: number
+  /** widelki na "wybaczalnosc" planszy (udzial wygranych losowych rozgrywek) */
+  minWinRate?: number
+  maxWinRate?: number
 }
 
 /**
- * Nowe rozdanie. Losujemy kilkadziesiat plansz i bierzemy pierwsza, ktora trafia
- * w widelki; gdy zadna nie trafi - te najblizsza. Martwa plansza nigdy nie wyjdzie,
- * bo o to prosimy w pierwszej kolejnosci.
+ * Nowe rozdanie. Kazdy kandydat ma sparowalny multizbior, a do tego sprawdzamy
+ * losowymi rozgrywkami, czy **da sie go wyczyscic do zera bez dosypywania** -
+ * inaczej "zagraj madrze" byloby pustym haslem. Widelki na winRate decyduja,
+ * czy plansza jest wyrozumiala (latwy), czy trzeba przy niej pomyslec (trudny).
  */
-export function dealBoard({ rows = START_ROWS, minPairs = 1, maxPairs = 999 }: Deal = {}): Board {
+export function dealBoard({
+  rows = START_ROWS,
+  tries = 40,
+  minWinRate = 0,
+  maxWinRate = 1,
+}: Deal = {}): Board {
+  const cells = rows * WIDTH
+  // przy nieparzystej liczbie cyfr jedna zawsze zostanie - takiej planszy nie da
+  // sie wyczyscic do zera nawet teoretycznie, wiec tyle wlasnie wymagamy
+  const perfect = cells % 2
   let best: Board | null = null
   let bestMiss = Infinity
 
-  for (let attempt = 0; attempt < 120; attempt++) {
-    const board: Board = Array.from({ length: rows * WIDTH }, () => ({
-      v: randomDigit(),
-      done: false,
-    }))
-    const pairs = countPairs(board)
-    if (pairs === 0) continue
-    if (pairs >= minPairs && pairs <= maxPairs) return board
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const board: Board = pairedDigits(cells).map((v) => ({ v, done: false }))
+    const { left, winRate } = solvability(board, tries)
+    if (left > perfect) continue // nie do wyczyszczenia - odrzucamy
+    if (winRate >= minWinRate && winRate <= maxWinRate) return board
 
-    const miss = pairs < minPairs ? minPairs - pairs : pairs - maxPairs
+    const miss = winRate < minWinRate ? minWinRate - winRate : winRate - maxWinRate
     if (miss < bestMiss) {
       bestMiss = miss
       best = board
     }
   }
 
-  return best ?? Array.from({ length: rows * WIDTH }, (_, i) => ({ v: (i % 9) + 1, done: false }))
+  // awaryjnie: byle nie martwa plansza (w praktyce nieosiagalne)
+  return best ?? pairedDigits(cells).map((v) => ({ v, done: false }))
 }
 
 /**
@@ -168,8 +241,20 @@ function dropEmptyRows(board: Board) {
  * Dosypanie cyfr: na koniec planszy trafia kopia tego, co jeszcze na niej
  * zostalo, w kolejnosci czytania. Zwraca tez indeks, od ktorego zaczynaja sie
  * swieze cyfry - ekran podswietla je i przewija do nich.
+ *
+ * Sama kopia **nie gwarantuje ruchu**: jedyna pewna nowa stycznosc to ostatnia
+ * zywa cyfra obok kopii pierwszej, a to nie musi byc para. Dlatego gdy po
+ * dosypaniu nadal nie ma pary, dokladamy jeszcze jedna kopie ostatniej cyfry -
+ * laduje tuz za kopia tej samej cyfry, wiec para jest zawsze. Dosypanie nigdy
+ * nie konczy gry przez przypadek.
  */
 export function addNumbers(board: Board) {
-  const fresh = board.filter((c) => !c.done).map((c) => ({ v: c.v, done: false }))
-  return { board: [...board, ...fresh], from: board.length }
+  const alive = board.filter((c) => !c.done)
+  const next: Board = [...board, ...alive.map((c) => ({ v: c.v, done: false }))]
+
+  if (alive.length > 0 && findPair(next) === null) {
+    next.push({ v: alive[alive.length - 1].v, done: false })
+  }
+
+  return { board: next, from: board.length }
 }
